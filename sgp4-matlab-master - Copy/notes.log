@@ -1,0 +1,38 @@
+.LOG
+
+
+6:20 AM 8/24/2005
+I initially built a matlab version of SGP4 from Vallado's C++ version available on Celestrak site.  I got that version to match output and saved it in RCS.  When I contacted Dave regarding an error in days2mdhms in the C++ version, I learned that he has a new version ready for release.  He sent me a copy, so I redid the matlab to match the new version.  Here are a few points of interest:
+
+* I modified the output to match the previous version for comparison.  The output differed significantly for cat nos 04632 and 25388 (the two lydane mod test cases).  I found that using the commented out AF80 inclination test in DPPER rather than the GSFC test gave the results from the previous version.  I set the output back to the new version and saved both inclination settings as tmatver.af80 and tmatver.gsfc.  I plotted the comparisons (see traj25388.jpg, vel25388.jpg, and dtraj04632.jpg).
+
+* In the C++ version, in twoline2rv, when using sscanf to read longstr1 and longstr2, the checksum digits are included as part of the preceding values (elnum and revnum).
+
+* In twoline2rv, the constant TU/min is given as
+
+	 tumin = 13.44654985511
+
+However, in the table at the back of Vallado, it gives
+
+	1 TU = 13.446 849 855 11
+
+Note the change in the 4th digit after the decimal point (from 5 to 8).
+
+
+5:35 AM 8/25/2005
+In further looking at the constants, it appears some (such as tumin) have been added based on WGS-84 or some other earth model not necessarily consistent with the WGS-72 used in the code. It would seem that in order to recover the mean elements from the two-line elements, it is necessary to use constants consistent with whatever AFSPC used to generate the TLEs in the first place.  Meanwhile, in the propagation, it would seem that the most current earth model constants would give the best results.
+
+
+8:11 AM 8/28/2005
+I recomputed tumin using WGS-72 as 13.44683969695931 and sent an email to Dave asking if it should be changed.
+
+
+2:10 PM 8/28/2005
+In twoline2rv, a Newton-Raphson iteration is used to compute eccentric and true anomalies, but these values are never used anywhere.
+
+
+5:41 AM 8/29/2005
+In sgp4init, Dave passes in the initial parameters as xomegao, xinclo, xargpo, xecco, xmo, xno, and xbstar.  He then reassigns them back on top of themselves.
+
+
+5:28 AM 10/19/2005
